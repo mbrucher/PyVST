@@ -29,29 +29,31 @@ def display(plugin, type):
   output = numpy.zeros((plugin.number_of_outputs, Samples), dtype=type)
 
   for i in range(Samples/2048):
-    plugin.process([input1[i*2048:(i+1)*2048], input2[i*2048:(i+1)*2048]] * (plugin.number_of_inputs / 2), output[:, i*2048:(i+1)*2048])
+    plugin.process([input1[i*2048:(i+1)*2048], input2[i*2048:(i+1)*2048]], output[:, i*2048:(i+1)*2048])
 
   return (input1, input2), output
 
 def plot(inputs, outputs, NFFT = 8192, noverlap = 1024):
   pyplot.figure()
-  a = pyplot.subplot(2, 2, 1)
+  a = pyplot.subplot(2, len(outputs), 1)
   pyplot.title("Input L")
   pyplot.specgram(inputs[0], NFFT = NFFT, Fs = SampleRate, noverlap = noverlap )
   #pyplot.plot(inputs[0])
-  a = pyplot.subplot(2, 2, 2)
-  pyplot.title("Input R")
-  pyplot.specgram(inputs[1], NFFT = NFFT, Fs = SampleRate, noverlap = noverlap )
-  #pyplot.plot(inputs[1])
+  if len(outputs) > 1:
+    a = pyplot.subplot(2, 2, 2)
+    pyplot.title("Input R")
+    pyplot.specgram(inputs[1], NFFT = NFFT, Fs = SampleRate, noverlap = noverlap )
+    #pyplot.plot(inputs[1])
 
-  a = pyplot.subplot(2, 2, 3)
+  a = pyplot.subplot(2, len(outputs), len(outputs) + 1)
   pyplot.title("Output L")
   pyplot.specgram(outputs[0], NFFT = NFFT, Fs = SampleRate, noverlap = noverlap )
   #pyplot.plot(outputs[0])
-  a = pyplot.subplot(2, 2, 4)
-  pyplot.title("Output R")
-  pyplot.specgram(outputs[1], NFFT = NFFT, Fs = SampleRate, noverlap = noverlap )
-  #pyplot.plot(outputs[1])
+  if len(outputs) > 1:
+    a = pyplot.subplot(2, 2, 4)
+    pyplot.title("Output R")
+    pyplot.specgram(outputs[1], NFFT = NFFT, Fs = SampleRate, noverlap = noverlap )
+    #pyplot.plot(outputs[1])
 
 import sys
 
