@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import time
+
 import matplotlib.pyplot as pyplot
 import numpy
 
@@ -28,8 +30,10 @@ def display(plugin, type):
   input2 = input1[::-1].flatten()
   output = numpy.zeros((plugin.number_of_outputs, Samples), dtype=type)
 
+  start = time.time()
   for i in range(Samples/2048):
     plugin.process([input1[i*2048:(i+1)*2048], input2[i*2048:(i+1)*2048]], output[:, i*2048:(i+1)*2048])
+  print "Elapsed time:", (time.time() - start)
 
   return (input1, input2), output
 
