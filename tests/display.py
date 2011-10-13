@@ -22,6 +22,7 @@ def raise_gui(plugin):
   frame.SetClientSize((rect.right, rect.bottom))
   frame.Show()
   app.MainLoop()
+  plugin.close_edit()
 
 def display(plugin, type):
   t = numpy.arange(Samples, dtype=type) / SampleRate
