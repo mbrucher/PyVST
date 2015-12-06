@@ -271,29 +271,56 @@ class VSTPlugin(object):
   def has_editor(self):
     return (self.__effect.flags & VstAEffectFlags.effFlagsHasEditor) == VstAEffectFlags.effFlagsHasEditor
     
-def dump_effect_properties(effect):
+def get_effect_properties(effect):
   """
-  Dump on the screen every thing about the effect properties
+  Return a dictionary of the effect properties
   """
-  print "Plugin name:", effect.get_name()
-  print "Vendor name:", effect.get_vendor()
-  print "Product name:", effect.get_product()
+  properties_dict = {}
+  properties_dict["Plugin name"] = effect.get_name()
+  properties_dict["Vendor name"] = effect.get_vendor()
+  properties_dict["Product name"] = effect.get_product()
   
-  print "numPrograms = %d\nnumParams = %d\nnumInputs = %d\nnumOutputs = %d\n"% (effect.number_of_programs, effect.number_of_parameters, effect.number_of_inputs, effect.number_of_outputs)
+  properties_dict["numPrograms"] =  effect.number_of_programs
+  properties_dict["numParams"] = effect.number_of_parameters
+  properties_dict["numInputs"] = effect.number_of_inputs
+  properties_dict["numOutputs"] = effect.number_of_outputs
 
+  programs_list = []
   for program_index in range(effect.number_of_programs):
     try:
       program_name = effect.get_program_name_indexed(program_index)
       effect.set_program(program_index)
       program_name = effect.get_program_name()
-      print "Program %03d: %s" % (program_index, program_name)
+      programs_list.append(program_name)
     except:
       pass
+  properties_dict["Program names"] = programs_list
 
+  params_list = []
   for param_index in range(effect.number_of_parameters):
     param_name = effect.get_parameter_name(param_index)
     param_display = effect.get_parameter_display(param_index)
     param_label = effect.get_parameter_label(param_index)
     value = effect.get_parameter(param_index)
-    print "Param %03d: %s [%s %s] (normalized = %f)" % (param_index, param_name, param_display, param_label, value)
-    
+    params_list.append({'param_name': param_name, 'param_display': param_display, 'param_label': param_label, 'curr_value': value})
+  properties_dict["Parameters"] = params_list
+  return properties_dict
+
+def dump_effect_properties(effect):
+  """
+  Dump on the screen every thing about the effect properties
+  """
+  properties_dict = get_effect_properties(effect)
+  for k in ["Plugin name", "Vendor name", "Product name", 
+            "numPrograms", "numParams", "numInputs", "numOutputs"]:
+    print '%s: %s' %(k, properties_dict[k])
+
+  for each_idx, each_program in enumerate(properties_dict["Program names"]):
+    print 'Program %03d: %s' %(each_idx, each_program)
+
+  for param_index, each_param  in enumerate(properties_dict["Parameters"]):
+    param_name = effect.get_parameter_name(param_index)
+    param_display = effect.get_parameter_display(param_index)
+    param_label = effect.get_parameter_label(param_index)
+    value = effect.get_parameter(param_index)
+    print "Param %03d: %s [%s %s] (normalized = %f)" % (param_index, each_param['param_name'], each_param['param_display'], each_param['param_label'], each_param['curr_value'])
